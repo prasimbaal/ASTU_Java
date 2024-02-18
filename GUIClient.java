@@ -1,3 +1,5 @@
+package p2pChat;
+
 import java.awt.*;
 import java.net.*;
 import java.io.*;
@@ -10,21 +12,24 @@ public class GUIClient extends JFrame implements ActionListener {
 
 	Socket client=null;
 	String serverAddr = "localhost";
+	String username;
 	PrintWriter out;
+	//prinReader readIn;
+	private BufferedWriter bfWrite;
+	private BufferedReader bfRead;
+	private ArrayList<GUIClient> clientGUI = new ArrayList<>();
 	int serverPort = 4999;
-	private JTextField tf;
-	private JButton send, close;
-	Scanner input;
+	private JTextField tfUsername, tfRecieved, tfMessage;
+	private JButton send, close, userbtn;
+	
 
 	public GUIClient(){
-		input = new Scanner(System.in);
-		try{
-
+		try{	
 			client = new Socket(serverAddr,serverPort);
 			System.out.println("Client " + client);
 			out = new PrintWriter(client.getOutputStream());
-			System.out.print("Your Message: ");
-			//String str = input.nextLine();
+			clientGUI.add(this); //add new client into arraylist of clients
+			
 			out.println();
 			out.flush();
 		}catch(IOException e){
@@ -35,22 +40,29 @@ public class GUIClient extends JFrame implements ActionListener {
 
 		Container cp = this.getContentPane();
 		cp.setLayout(new FlowLayout());
-		cp.add(new JLabel("Enter Your Message: "));
-		tf = new JTextField(40);
-		tf.addActionListener(this);
-		cp.add(tf);
+		cp.add(new JLabel("Enter Your user name: "));
+		tfUsername = new JTextField("Enter User name", 40);
+		tfUsername.addActionListener(this);
+
+		userbtn = new JButton("Username submit");
+		userbtn.addActionListener(this);
+		cp.add(tfUsername);
+
 
 		send =  new JButton("SEND");
 		send.addActionListener(this);
 
 		close = new JButton("CLOSE");
 		close.addActionListener(this);
+		
+		cp.add(userbtn); //username submition button
 		cp.add(send);
 		cp.add(close);
+
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setTitle("Client page");
-		this.setSize(200,300);
+		this.setSize(500,400);
 		this.setVisible(true);
 	}
 
@@ -58,8 +70,16 @@ public class GUIClient extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e){
 			Object obj = e.getSource();
-			if(obj==send){
-				String message = tf.getText();
+			if(obj==userbtn){
+				username = tfUsername.getText();
+				out.print(username);
+				out.flush();
+				System.out.println(username);
+				tfUsername.setText("");
+
+			}
+			else if(obj==send){
+				String message = tfUsername.getText();
 				if(message.equals("quit")){
 					try{
 						out.close();
@@ -69,7 +89,7 @@ public class GUIClient extends JFrame implements ActionListener {
 				else{
 					out.print(message);
 					out.flush();
-					tf.setText("");
+					tfUsername.setText("");
 				}
 	}else{
 		try{

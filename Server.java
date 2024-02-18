@@ -1,15 +1,18 @@
+package p2pChat;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 
-public class Server {
+public class Server implements Runnable{
+
 	public static void main(String[] args) throws IOException{
 
 		Scanner input = new Scanner(System.in);
 		ServerSocket server = new ServerSocket(4999);
 		// System.out.print("Server: " + server);
-		Socket client = server.accept();
+		Socket client = server.accept(); //blocks until connection is made with client
 
 		System.out.println("Client connected ");
 
